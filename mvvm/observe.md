@@ -175,3 +175,31 @@ const data = {
 };
 const observer = new Observer(data);
 ```
+
+上面的监听封装只能监听Object对象，而不能监听到数组的变化，那么如何来监听数组的变化呢？通常我们是通过重新包装数组的 `pop`、`push` 等方法来实现。
+
+但是我们只能对我们要监听的数据数组进行包装，而不能直接通过修改 `Array.prototype` 中方法的方式来实现，因为这样会污染到全局。
+
+```javascript
+
+const arrayAugmentations = Object.create(Array.prototype);
+
+['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'].forEach((method) => {
+  const original = Array.prototype[method];
+  Object.defineProperty(arrayAugmentations, method, {
+    value: function () {
+      console.log(`执行了${method}方法！`);
+      const args = [].slice.call(arguments);
+      const result = original.apply(this, args)
+      return result;
+    },
+    enumerable: false,
+    writable: true,
+    configurable: true
+  });
+});
+
+let list = ['a', 'b', 'c'];
+list.__proto__ = arrayAugmentations;
+list.push('d'); // 执行了push方法！ 4
+```
