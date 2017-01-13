@@ -112,11 +112,9 @@ class Observer {
   // 使用递归的方式，监听对象的每一个属性
   walk (obj) {
     Object.keys(obj).forEach(key => {
-      if (obj.hasOwnProperty(key)) {
-        let val = obj[key];
-        this.observe(key, val);
-        this.convert(key, val);
-      }
+      let val = obj[key];
+      this.observe(key, val);
+      this.convert(key, val);
     });
   }
 
